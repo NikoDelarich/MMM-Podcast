@@ -1,7 +1,7 @@
 'use strict';
 
 /* Magic Mirror
- * Module: MMM-Video
+ * Module: MMM-RandomVideo
  *
  * MIT Licensed.
  */
@@ -15,10 +15,7 @@ module.exports = NodeHelper.create({
 	socketNotificationReceived: function(notification, payload) {
 		const self = this;
 		this.config = payload;
-		if(notification == "VIDEO_DOWNLOAD"){
-			this.downloadVideo(self.config.videoUrl,"modules/MMM-Podcast/video.mp4",function(){self.loaded = true;});
-		}
-		else if (notification == 'VIDEO_CHANGED') {		
+		if (notification == 'VIDEO_CHANGED') {		
 			var omx = require('omxdirector');
 			this.config = payload;	
 			var status = omx.getStatus();
@@ -26,25 +23,12 @@ module.exports = NodeHelper.create({
 				omx.stop();
 			}  
 			else if(this.loaded){
-				omx.play("modules/MMM-Podcast/video.mp4");
+				//TODO
+				omx.play("modules/MMM-RandomVideo/videos/vid1.mp4");
 			}
 			else{
 				setTimeout(function(){this.socketNotificationReceived(notification, payload)},2000);
 			}
 		}
-	},
-	downloadVideo : function(url, dest, cb){
-		var normalizedUrl = url.replace("https://", "http://");
-		this.loaded = false;
-		var http = require('http');
-		var fs = require('fs');
-		const self = this;
-		var file = fs.createWriteStream(dest);
-		var request = http.get(normalizedUrl, function(response) {
-			response.pipe(file);
-			file.on('finish', function() {
-				file.close(cb);			
-			});
-		});
-	},
+	}
 });
